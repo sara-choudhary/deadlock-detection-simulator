@@ -234,7 +234,7 @@ JavaScript tests by calling `node --test tests/js/logic.test.js`. If Node is not
 is older than version 18), that test is reported as **skipped** rather than failed.
 
 At the time of writing, the author's run on macOS (Python 3.9.6, Flask 3.1.3, pytest 8.4.2)
-reported **357 passed**. If Node is not installed on your machine you should instead see one
+reported **369 passed**. If Node is not installed on your machine you should instead see one
 skipped test. Exact counts can change if tests are added.
 
 Useful variations:
