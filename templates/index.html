@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Deadlock Detection Simulator</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%231d4ed8'/%3E%3Ccircle cx='7' cy='12' r='3' fill='none' stroke='white' stroke-width='1.8'/%3E%3Ccircle cx='17' cy='12' r='3' fill='none' stroke='white' stroke-width='1.8'/%3E%3C/svg%3E">
+  <!-- Choose the theme before the page is painted, so there is no flash.
+       A saved choice wins; otherwise the system setting is used. -->
+  <script>
+    (function () {
+      var theme = null;
+      try { theme = window.localStorage.getItem("dds-theme"); } catch (e) { theme = null; }
+      if (theme !== "light" && theme !== "dark") {
+        var dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        theme = dark ? "dark" : "light";
+      }
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#inputs">Skip to the inputs</a>
+
+  <header class="masthead">
+    <div class="wrap">
+      <div class="masthead-row">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6.5" cy="12" r="3.2"/><circle cx="17.5" cy="12" r="3.2"/>
+              <path d="M9.7 10.2c1.4-1.2 3.2-1.2 4.6 0M14.3 13.8c-1.4 1.2-3.2 1.2-4.6 0"/>
+            </svg>
+          </span>
+          <div>
+            <p class="eyebrow"><span class="badge">Operating Systems &middot; Deadlock detection</span></p>
+            <h1>Deadlock Detection Simulator</h1>
+          </div>
+        </div>
+        <button type="button" class="btn btn-quiet theme-toggle" id="theme-toggle" aria-label="Switch to dark theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/>
+          </svg>
+          <span id="theme-toggle-text">Dark</span>
+        </button>
+      </div>
+      <p class="lede">
+        Describe what each process holds and what it is still waiting for. The server runs the
+        standard detection algorithm for resource types with several identical instances, then
+        shows which processes can finish, which cannot, and why, one scan at a time.
+      </p>
+      <p class="aside">
+        This detects deadlock in a snapshot you describe. It is not the Banker's algorithm, which
+        decides whether granting a request would be safe.
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap" id="main">
+
+    <!-- Step 1: system size and examples -->
+    <section class="panel" aria-labelledby="h-system">
+      <div class="panel-head">
+        <span class="step-num" aria-hidden="true">1</span>
+        <div>
+          <h2 id="h-system">System</h2>
+          <p class="hint">
+            A resource type can have several identical instances, for example 3 printers.
+            Changing the size keeps the numbers you already typed and fills new cells with 0.
+          </p>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="field">
+          <label for="p-count">Processes</label>
+          <select id="p-count"></select>
+        </div>
+        <div class="field">
+          <label for="r-count">Resource types</label>
+          <select id="r-count"></select>
+        </div>
+        <div class="field field-wide">
+          <label for="sample-select">Example</label>
+          <div class="inline">
+            <select id="sample-select"></select>
+            <button type="button" class="btn" id="load-sample-btn">Load example</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label-spacer" aria-hidden="true">&nbsp;</span>
+          <button type="button" class="btn btn-quiet" id="reset-btn">Reset to starting example</button>
+        </div>
+      </div>
+      <div class="example-note">
+        <p class="source-line"><span class="tag" id="data-source">Example</span></p>
+        <p class="sample-note" id="sample-description" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- Step 2: inputs -->
+    <section id="inputs" class="panel" aria-labelledby="h-inputs" tabindex="-1">
+      <div class="panel-head">
+        <span class="step-num" aria-hidden="true">2</span>
+        <div>
+          <h2 id="h-inputs">Inputs</h2>
+          <p class="hint">
+            Whole numbers, 0 or more. Click a cell and type to replace its value. A corner mark on a
+            cell means you changed it from the loaded example.
+          </p>
+        </div>
+      </div>
+
+      <div class="ledgers">
+        <div class="ledger ledger-available">
+          <h3 id="h-available"><span class="ledger-key" aria-hidden="true">A</span>Available</h3>
+          <p class="hint">Free instances of each resource type right now.</p>
+          <div class="table-scroll" role="region" aria-labelledby="h-available" tabindex="0">
+            <div id="available-grid"></div>
+          </div>
+        </div>
+        <div class="ledger ledger-allocation">
+          <h3 id="h-allocation"><span class="ledger-key" aria-hidden="true">H</span>Allocation</h3>
+          <p class="hint">How many instances of each resource a process holds now.</p>
+          <div class="table-scroll" role="region" aria-labelledby="h-allocation" tabindex="0">
+            <div id="allocation-grid"></div>
+          </div>
+        </div>
+        <div class="ledger ledger-request">
+          <h3 id="h-request"><span class="ledger-key" aria-hidden="true">W</span>Request</h3>
+          <p class="hint">How many more instances a process is waiting for before it can finish.</p>
+          <div class="table-scroll" role="region" aria-labelledby="h-request" tabindex="0">
+            <div id="request-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="input-errors" class="alert alert-error" role="alert" hidden></div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="detect-btn">
+          <span class="spinner" aria-hidden="true"></span>
+          <span id="detect-label">Detect deadlock</span>
+        </button>
+        <button type="button" class="btn" id="clear-btn" disabled>Clear results</button>
+        <span class="run-status" id="run-status" role="status" aria-live="polite"></span>
+      </div>
+      <div id="api-error" class="alert alert-error" role="alert" hidden></div>
+    </section>
+
+    <!-- Step 3: results (filled in by app.js from the server's answer) -->
+    <section id="results-section" class="panel" aria-labelledby="h-results" hidden>
+      <div class="panel-head">
+        <span class="step-num" aria-hidden="true">3</span>
+        <div>
+          <h2 id="h-results">Result</h2>
+        </div>
+      </div>
+      <p class="stale-note" id="stale-note" hidden>
+        You changed the inputs after this result was produced. It describes the earlier inputs.
+        Run detection again to update it.
+      </p>
+      <div id="results"></div>
+    </section>
+
+    <!-- Explanation -->
+    <section class="panel" aria-labelledby="h-how">
+      <h2 id="h-how">How detection works</h2>
+      <p>
+        The server starts with <strong>Work</strong> equal to Available. A process that holds nothing
+        starts as finished, because it cannot be blocking anyone. Then it repeats:
+      </p>
+      <ol class="steps">
+        <li>Find the lowest-numbered unfinished process whose Request fits inside Work, resource by resource.</li>
+        <li>If there is one, assume it runs to completion and returns what it holds: add its Allocation to Work.</li>
+        <li>If there is none, stop. Every process still unfinished is reported as deadlocked.</li>
+      </ol>
+      <h3>Reading the result</h3>
+      <p>
+        <strong>No deadlock</strong> means there is an order in which every process can finish, using the
+        resources released along the way. <strong>Deadlock detected</strong> means the listed processes can
+        never get what they wait for, because it is held by processes that are themselves stuck. The answer
+        describes only the numbers you entered. No real processes are inspected, and the order shown is one
+        valid order, not a promise about every possible schedule.
+      </p>
+      <h3>Symbols used in the result</h3>
+      <ul class="legend" id="legend" aria-label="Meaning of the process symbols"></ul>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <p>Deadlock Detection Simulator: Operating Systems mini project (deadlock detection).</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/samples.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/logic.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

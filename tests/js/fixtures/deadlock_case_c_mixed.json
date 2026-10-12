@@ -1,0 +1,208 @@
+{
+  "payload": {
+    "allocation": [
+      [
+        1,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "available": [
+      0,
+      1
+    ],
+    "process_count": 3,
+    "request": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        0
+      ],
+      [
+        0,
+        2
+      ]
+    ],
+    "resource_count": 2
+  },
+  "response": {
+    "blocked_explanations": {
+      "P2": {
+        "allocation": [
+          0,
+          1
+        ],
+        "explanation": "P2 cannot finish: it is waiting for R1 (needs 2, only 1 available) in the final Work vector.",
+        "final_work": [
+          1,
+          1
+        ],
+        "request": [
+          2,
+          0
+        ],
+        "shortages": [
+          {
+            "available": 1,
+            "requested": 2,
+            "resource": "R1",
+            "shortfall": 1
+          }
+        ]
+      },
+      "P3": {
+        "allocation": [
+          1,
+          0
+        ],
+        "explanation": "P3 cannot finish: it is waiting for R2 (needs 2, only 1 available) in the final Work vector.",
+        "final_work": [
+          1,
+          1
+        ],
+        "request": [
+          0,
+          2
+        ],
+        "shortages": [
+          {
+            "available": 1,
+            "requested": 2,
+            "resource": "R2",
+            "shortfall": 1
+          }
+        ]
+      }
+    },
+    "completion_sequence": [
+      "P1"
+    ],
+    "deadlocked_processes": [
+      "P2",
+      "P3"
+    ],
+    "final_work": [
+      1,
+      1
+    ],
+    "finish_status": {
+      "P1": true,
+      "P2": false,
+      "P3": false
+    },
+    "finished_processes": [
+      "P1"
+    ],
+    "initial_work": [
+      0,
+      1
+    ],
+    "initially_finished": [],
+    "message": "Deadlock detected: P2, P3 cannot finish (potentially deadlocked under the standard model, for the supplied snapshot).",
+    "process_count": 3,
+    "resource_count": 2,
+    "status": "DEADLOCK_DETECTED",
+    "stop_reason": "No unfinished process has a request that fits within Work [1, 1]. Stopped with P2, P3 unfinished.",
+    "success": true,
+    "trace": [
+      {
+        "allocation_released": [
+          1,
+          0
+        ],
+        "considered": [
+          {
+            "can_satisfy": true,
+            "process": "P1",
+            "request": [
+              0,
+              1
+            ]
+          },
+          {
+            "can_satisfy": false,
+            "process": "P2",
+            "request": [
+              2,
+              0
+            ]
+          },
+          {
+            "can_satisfy": false,
+            "process": "P3",
+            "request": [
+              0,
+              2
+            ]
+          }
+        ],
+        "finish_before": {
+          "P1": false,
+          "P2": false,
+          "P3": false
+        },
+        "iteration": 1,
+        "selected": "P1",
+        "selected_request": [
+          0,
+          1
+        ],
+        "work_after": [
+          1,
+          1
+        ],
+        "work_before": [
+          0,
+          1
+        ]
+      },
+      {
+        "allocation_released": null,
+        "considered": [
+          {
+            "can_satisfy": false,
+            "process": "P2",
+            "request": [
+              2,
+              0
+            ]
+          },
+          {
+            "can_satisfy": false,
+            "process": "P3",
+            "request": [
+              0,
+              2
+            ]
+          }
+        ],
+        "finish_before": {
+          "P1": true,
+          "P2": false,
+          "P3": false
+        },
+        "iteration": 2,
+        "selected": null,
+        "selected_request": null,
+        "work_after": [
+          1,
+          1
+        ],
+        "work_before": [
+          1,
+          1
+        ]
+      }
+    ]
+  }
+}

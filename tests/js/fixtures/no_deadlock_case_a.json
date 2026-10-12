@@ -1,0 +1,139 @@
+{
+  "payload": {
+    "allocation": [
+      [
+        1,
+        0
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "available": [
+      1,
+      1
+    ],
+    "process_count": 2,
+    "request": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "resource_count": 2
+  },
+  "response": {
+    "blocked_explanations": {},
+    "completion_sequence": [
+      "P1",
+      "P2"
+    ],
+    "deadlocked_processes": [],
+    "final_work": [
+      2,
+      2
+    ],
+    "finish_status": {
+      "P1": true,
+      "P2": true
+    },
+    "finished_processes": [
+      "P1",
+      "P2"
+    ],
+    "initial_work": [
+      1,
+      1
+    ],
+    "initially_finished": [],
+    "message": "No deadlock detected: every process can finish.",
+    "process_count": 2,
+    "resource_count": 2,
+    "status": "NO_DEADLOCK",
+    "stop_reason": "All processes finished.",
+    "success": true,
+    "trace": [
+      {
+        "allocation_released": [
+          1,
+          0
+        ],
+        "considered": [
+          {
+            "can_satisfy": true,
+            "process": "P1",
+            "request": [
+              0,
+              1
+            ]
+          },
+          {
+            "can_satisfy": true,
+            "process": "P2",
+            "request": [
+              1,
+              0
+            ]
+          }
+        ],
+        "finish_before": {
+          "P1": false,
+          "P2": false
+        },
+        "iteration": 1,
+        "selected": "P1",
+        "selected_request": [
+          0,
+          1
+        ],
+        "work_after": [
+          2,
+          1
+        ],
+        "work_before": [
+          1,
+          1
+        ]
+      },
+      {
+        "allocation_released": [
+          0,
+          1
+        ],
+        "considered": [
+          {
+            "can_satisfy": true,
+            "process": "P2",
+            "request": [
+              1,
+              0
+            ]
+          }
+        ],
+        "finish_before": {
+          "P1": true,
+          "P2": false
+        },
+        "iteration": 2,
+        "selected": "P2",
+        "selected_request": [
+          1,
+          0
+        ],
+        "work_after": [
+          2,
+          2
+        ],
+        "work_before": [
+          2,
+          1
+        ]
+      }
+    ]
+  }
+}
