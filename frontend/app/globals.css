@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Design tokens
+   Plain CSS variables on :root, so switching theme only swaps values.
+   Light is the default. Dark applies when <html data-theme="dark"> is set
+   (the toggle does this). The media query below is only a fallback for
+   when no theme has been chosen yet (for example, before scripts run).
+   ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+  --paper: #f4efe6;      /* page background: warm off-white */
+  --paper-2: #ebe4d6;    /* slightly darker panels and table headers */
+  --ink: #17150f;        /* main text: near-black */
+  --soft: #5a5448;       /* secondary text */
+  --rule: #cdc4b2;       /* thin dividers and borders (not used for text) */
+  --accent: #a63c24;     /* terracotta: links, buttons, deadlocked */
+  --on-accent: #fffaf2;  /* text on top of the accent colour */
+  --ok: #2c6847;         /* completed processes */
+  --warn: #80590d;       /* unfinished / stale / edited */
+
+  /* System fonts only: nothing to download, works offline. */
+  --stack-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --stack-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --stack-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #14120e;
+  --paper-2: #1d1a14;
+  --ink: #efe9dc;
+  --soft: #b3ab9b;
+  --rule: #3b362b;
+  --accent: #e8876a;
+  --on-accent: #14120e;
+  --ok: #86c9a0;
+  --warn: #dfb85f;
+}
+
+/* Fallback: no saved or chosen theme yet, and the system is in dark mode.
+   Keep these values identical to the data-theme="dark" block above. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --paper: #14120e;
+    --paper-2: #1d1a14;
+    --ink: #efe9dc;
+    --soft: #b3ab9b;
+    --rule: #3b362b;
+    --accent: #e8876a;
+    --on-accent: #14120e;
+    --ok: #86c9a0;
+    --warn: #dfb85f;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Tell Tailwind about the tokens, so classes like bg-paper, text-ink,
+   text-soft, border-rule, text-accent, bg-accent, text-ok, text-warn,
+   font-serif, font-sans and font-mono work. "inline" makes the classes
+   point at the variables above, so they follow the theme.
+   ------------------------------------------------------------------ */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-soft: var(--soft);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+
+  --font-serif: var(--stack-serif);
+  --font-sans: var(--stack-sans);
+  --font-mono: var(--stack-mono);
+}
+
+/* ------------------------------------------------------------------
+   Base styles. They live in @layer base so Tailwind classes written on
+   elements can still override them. They use the plain :root variables
+   directly, so they never depend on how Tailwind emits theme variables.
+   ------------------------------------------------------------------ */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--stack-sans);
+    line-height: 1.55;
+    overflow-wrap: break-word;
+  }
+
+  /* A clear keyboard focus ring on everything that can be focused. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Respect the "reduce motion" system setting: no animations, no
+   smooth scrolling, transitions effectively instant.
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
